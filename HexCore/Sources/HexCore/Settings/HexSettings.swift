@@ -45,6 +45,9 @@ public struct HexSettings: Codable, Equatable, Sendable {
 	public var wordRemovalsEnabled: Bool
 	public var wordRemovals: [WordRemoval]
 	public var wordRemappings: [WordRemapping]
+	public var hotwords: [String]
+	public var enableInstantEdit: Bool
+	public var autoLearnFromEdits: Bool
 
 	public init(
 		soundEffectsEnabled: Bool = true,
@@ -68,7 +71,10 @@ public struct HexSettings: Codable, Equatable, Sendable {
 		hasCompletedStorageMigration: Bool = false,
 		wordRemovalsEnabled: Bool = false,
 		wordRemovals: [WordRemoval] = HexSettings.defaultWordRemovals,
-		wordRemappings: [WordRemapping] = []
+		wordRemappings: [WordRemapping] = [],
+		hotwords: [String] = [],
+		enableInstantEdit: Bool = true,
+		autoLearnFromEdits: Bool = true
 	) {
 		self.soundEffectsEnabled = soundEffectsEnabled
 		self.soundEffectsVolume = soundEffectsVolume
@@ -92,6 +98,9 @@ public struct HexSettings: Codable, Equatable, Sendable {
 		self.wordRemovalsEnabled = wordRemovalsEnabled
 		self.wordRemovals = wordRemovals
 		self.wordRemappings = wordRemappings
+		self.hotwords = hotwords
+		self.enableInstantEdit = enableInstantEdit
+		self.autoLearnFromEdits = autoLearnFromEdits
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -136,6 +145,9 @@ private enum HexSettingKey: String, CodingKey, CaseIterable {
 	case wordRemovalsEnabled
 	case wordRemovals
 	case wordRemappings
+	case hotwords
+	case enableInstantEdit
+	case autoLearnFromEdits
 }
 
 private struct SettingsField<Value: Codable & Sendable> {
@@ -266,6 +278,21 @@ private enum HexSettingsSchema {
 			.wordRemappings,
 			keyPath: \.wordRemappings,
 			default: defaults.wordRemappings
+		).eraseToAny(),
+		SettingsField(
+			.hotwords,
+			keyPath: \.hotwords,
+			default: defaults.hotwords
+		).eraseToAny(),
+		SettingsField(
+			.enableInstantEdit,
+			keyPath: \.enableInstantEdit,
+			default: defaults.enableInstantEdit
+		).eraseToAny(),
+		SettingsField(
+			.autoLearnFromEdits,
+			keyPath: \.autoLearnFromEdits,
+			default: defaults.autoLearnFromEdits
 		).eraseToAny()
 	]
 }

@@ -20,6 +20,7 @@ struct PasteboardClient {
     var paste: @Sendable (String) async -> Void
     var copy: @Sendable (String) async -> Void
     var sendKeyboardCommand: @Sendable (KeyboardCommand) async -> Void
+    var pasteDirectly: @Sendable (String) async -> Bool = { _ in false }
 }
 
 extension PasteboardClient: DependencyKey {
@@ -34,6 +35,9 @@ extension PasteboardClient: DependencyKey {
             },
             sendKeyboardCommand: { command in
                 await live.sendKeyboardCommand(command)
+            },
+            pasteDirectly: { text in
+                await live.pasteDirectly(text: text)
             }
         )
     }
@@ -87,6 +91,30 @@ struct PasteboardClientLive {
         } else {
             simulateTypingWithAppleScript(text)
         }
+    }
+
+    /// Directly pastes text using the most reliable method, ignoring user settings.
+    /// Used for instant edit feature where we always want to paste successfully.
+    @MainActor
+    func pasteDirectly(text: String) async -> Bool {
+        let pasteboard = NSPasteboard.general
+        let snapshot = PasteboardSnapshot(pasteboard: pasteboard)
+        let targetChangeCount = writeAndTrackChangeCount(pasteboard: pasteboard, text: text)
+        _ = await waitForPasteboardCommit(targetChangeCount: targetChangeCount)
+        let pasteSucceeded = await performPaste(text)
+
+        // Always restore original pasteboard contents after direct paste
+        // This ensures user's clipboard is not affected by the instant edit feature
+        if pasteSucceeded {
+            let savedSnapshot = snapshot
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(500))
+                pasteboard.clearContents()
+                savedSnapshot.restore(to: pasteboard)
+            }
+        }
+
+        return pasteSucceeded
     }
     
     @MainActor

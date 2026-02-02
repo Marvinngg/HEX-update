@@ -221,14 +221,94 @@ struct TranscriptView: View {
 	let onCopy: () -> Void
 	let onDelete: () -> Void
 
+	@State private var showEditDetails = false
+
 	var body: some View {
 		VStack(alignment: .leading, spacing: 0) {
-			Text(transcript.text)
-				.font(.body)
-				.lineLimit(nil)
-				.fixedSize(horizontal: false, vertical: true)
-				.padding(.trailing, 40) // Space for buttons
-				.padding(12)
+			// Main transcription text
+			HStack(alignment: .top, spacing: 8) {
+				Text(transcript.text)
+					.font(.body)
+					.lineLimit(nil)
+					.fixedSize(horizontal: false, vertical: true)
+					.padding(.trailing, 40) // Space for buttons
+
+				// Edited badge
+				if transcript.wasEdited {
+					Button {
+						showEditDetails.toggle()
+					} label: {
+						HStack(spacing: 4) {
+							Image(systemName: showEditDetails ? "chevron.down" : "chevron.right")
+								.font(.caption2)
+							Text("已编辑")
+								.font(.caption)
+						}
+						.padding(.horizontal, 6)
+						.padding(.vertical, 3)
+						.background(Color.orange.opacity(0.2))
+						.foregroundStyle(.orange)
+						.cornerRadius(4)
+					}
+					.buttonStyle(.plain)
+					.help("点击查看修改详情")
+				}
+			}
+			.padding(12)
+
+			// Edit details (expandable)
+			if showEditDetails && transcript.wasEdited {
+				VStack(alignment: .leading, spacing: 8) {
+					Divider()
+
+					VStack(alignment: .leading, spacing: 4) {
+						Text("修改详情")
+							.font(.caption)
+							.fontWeight(.semibold)
+							.foregroundStyle(.secondary)
+
+						if let originalText = transcript.originalText {
+							HStack(alignment: .top, spacing: 8) {
+								Image(systemName: "arrow.turn.up.left")
+									.font(.caption)
+									.foregroundStyle(.secondary)
+								Text(originalText)
+									.font(.body)
+									.foregroundStyle(.secondary)
+									.strikethrough()
+							}
+						}
+
+						if !transcript.corrections.isEmpty {
+							Divider()
+								.padding(.vertical, 4)
+
+							Text("修改的词汇:")
+								.font(.caption)
+								.foregroundStyle(.secondary)
+
+							ForEach(transcript.corrections) { correction in
+								HStack(spacing: 6) {
+									Text(correction.original)
+										.font(.body)
+										.foregroundStyle(.red)
+										.strikethrough()
+									Image(systemName: "arrow.right")
+										.font(.caption)
+										.foregroundStyle(.secondary)
+									Text(correction.corrected)
+										.font(.body)
+										.foregroundStyle(.green)
+										.fontWeight(.medium)
+								}
+								.padding(.leading, 20)
+							}
+						}
+					}
+					.padding(.horizontal, 12)
+					.padding(.bottom, 8)
+				}
+			}
 
 			Divider()
 

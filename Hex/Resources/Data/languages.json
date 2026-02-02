@@ -1,233 +1,291 @@
 [
     {
-        "name": "Auto"
+        "name": "Auto",
+        "name_zh": "自动"
     },
     {
         "code": "af",
-        "name": "Afrikaans"
+        "name": "Afrikaans",
+        "name_zh": "南非荷兰语"
     },
     {
         "code": "ar",
-        "name": "Arabic"
+        "name": "Arabic",
+        "name_zh": "阿拉伯语"
     },
     {
         "code": "hy",
-        "name": "Armenian"
+        "name": "Armenian",
+        "name_zh": "亚美尼亚语"
     },
     {
         "code": "az",
-        "name": "Azerbaijani"
+        "name": "Azerbaijani",
+        "name_zh": "阿塞拜疆语"
     },
     {
         "code": "be",
-        "name": "Belarusian"
+        "name": "Belarusian",
+        "name_zh": "白俄罗斯语"
     },
     {
         "code": "bs",
-        "name": "Bosnian"
+        "name": "Bosnian",
+        "name_zh": "波斯尼亚语"
     },
     {
         "code": "bg",
-        "name": "Bulgarian"
+        "name": "Bulgarian",
+        "name_zh": "保加利亚语"
     },
     {
         "code": "ca",
-        "name": "Catalan"
+        "name": "Catalan",
+        "name_zh": "加泰罗尼亚语"
     },
     {
         "code": "zh",
-        "name": "Chinese"
+        "name": "Chinese",
+        "name_zh": "中文"
     },
     {
         "code": "hr",
-        "name": "Croatian"
+        "name": "Croatian",
+        "name_zh": "克罗地亚语"
     },
     {
         "code": "cs",
-        "name": "Czech"
+        "name": "Czech",
+        "name_zh": "捷克语"
     },
     {
         "code": "da",
-        "name": "Danish"
+        "name": "Danish",
+        "name_zh": "丹麦语"
     },
     {
         "code": "nl",
-        "name": "Dutch"
+        "name": "Dutch",
+        "name_zh": "荷兰语"
     },
     {
         "code": "en",
-        "name": "English"
+        "name": "English",
+        "name_zh": "英语"
     },
     {
         "code": "et",
-        "name": "Estonian"
+        "name": "Estonian",
+        "name_zh": "爱沙尼亚语"
     },
     {
         "code": "fi",
-        "name": "Finnish"
+        "name": "Finnish",
+        "name_zh": "芬兰语"
     },
     {
         "code": "fr",
-        "name": "French"
+        "name": "French",
+        "name_zh": "法语"
     },
     {
         "code": "gl",
-        "name": "Galician"
+        "name": "Galician",
+        "name_zh": "加利西亚语"
     },
     {
         "code": "de",
-        "name": "German"
+        "name": "German",
+        "name_zh": "德语"
     },
     {
         "code": "el",
-        "name": "Greek"
+        "name": "Greek",
+        "name_zh": "希腊语"
     },
     {
         "code": "he",
-        "name": "Hebrew"
+        "name": "Hebrew",
+        "name_zh": "希伯来语"
     },
     {
         "code": "hi",
-        "name": "Hindi"
+        "name": "Hindi",
+        "name_zh": "印地语"
     },
     {
         "code": "hu",
-        "name": "Hungarian"
+        "name": "Hungarian",
+        "name_zh": "匈牙利语"
     },
     {
         "code": "is",
-        "name": "Icelandic"
+        "name": "Icelandic",
+        "name_zh": "冰岛语"
     },
     {
         "code": "id",
-        "name": "Indonesian"
+        "name": "Indonesian",
+        "name_zh": "印度尼西亚语"
     },
     {
         "code": "it",
-        "name": "Italian"
+        "name": "Italian",
+        "name_zh": "意大利语"
     },
     {
         "code": "ja",
-        "name": "Japanese"
+        "name": "Japanese",
+        "name_zh": "日语"
     },
     {
         "code": "kn",
-        "name": "Kannada"
+        "name": "Kannada",
+        "name_zh": "卡纳达语"
     },
     {
         "code": "kk",
-        "name": "Kazakh"
+        "name": "Kazakh",
+        "name_zh": "哈萨克语"
     },
     {
         "code": "ko",
-        "name": "Korean"
+        "name": "Korean",
+        "name_zh": "韩语"
     },
     {
         "code": "lv",
-        "name": "Latvian"
+        "name": "Latvian",
+        "name_zh": "拉脱维亚语"
     },
     {
         "code": "lt",
-        "name": "Lithuanian"
+        "name": "Lithuanian",
+        "name_zh": "立陶宛语"
     },
     {
         "code": "mk",
-        "name": "Macedonian"
+        "name": "Macedonian",
+        "name_zh": "马其顿语"
     },
     {
         "code": "ms",
-        "name": "Malay"
+        "name": "Malay",
+        "name_zh": "马来语"
     },
     {
         "code": "mr",
-        "name": "Marathi"
+        "name": "Marathi",
+        "name_zh": "马拉地语"
     },
     {
         "code": "mi",
-        "name": "Maori"
+        "name": "Maori",
+        "name_zh": "毛利语"
     },
     {
         "code": "ne",
-        "name": "Nepali"
+        "name": "Nepali",
+        "name_zh": "尼泊尔语"
     },
     {
         "code": "no",
-        "name": "Norwegian"
+        "name": "Norwegian",
+        "name_zh": "挪威语"
     },
     {
         "code": "fa",
-        "name": "Persian"
+        "name": "Persian",
+        "name_zh": "波斯语"
     },
     {
         "code": "pl",
-        "name": "Polish"
+        "name": "Polish",
+        "name_zh": "波兰语"
     },
     {
         "code": "pt",
-        "name": "Portuguese"
+        "name": "Portuguese",
+        "name_zh": "葡萄牙语"
     },
     {
         "code": "ro",
-        "name": "Romanian"
+        "name": "Romanian",
+        "name_zh": "罗马尼亚语"
     },
     {
         "code": "ru",
-        "name": "Russian"
+        "name": "Russian",
+        "name_zh": "俄语"
     },
     {
         "code": "sr",
-        "name": "Serbian"
+        "name": "Serbian",
+        "name_zh": "塞尔维亚语"
     },
     {
         "code": "sk",
-        "name": "Slovak"
+        "name": "Slovak",
+        "name_zh": "斯洛伐克语"
     },
     {
         "code": "sl",
-        "name": "Slovenian"
+        "name": "Slovenian",
+        "name_zh": "斯洛文尼亚语"
     },
     {
         "code": "es",
-        "name": "Spanish"
+        "name": "Spanish",
+        "name_zh": "西班牙语"
     },
     {
         "code": "sw",
-        "name": "Swahili"
+        "name": "Swahili",
+        "name_zh": "斯瓦希里语"
     },
     {
         "code": "sv",
-        "name": "Swedish"
+        "name": "Swedish",
+        "name_zh": "瑞典语"
     },
     {
         "code": "tl",
-        "name": "Tagalog"
+        "name": "Tagalog",
+        "name_zh": "他加禄语"
     },
     {
         "code": "ta",
-        "name": "Tamil"
+        "name": "Tamil",
+        "name_zh": "泰米尔语"
     },
     {
         "code": "th",
-        "name": "Thai"
+        "name": "Thai",
+        "name_zh": "泰语"
     },
     {
         "code": "tr",
-        "name": "Turkish"
+        "name": "Turkish",
+        "name_zh": "土耳其语"
     },
     {
         "code": "uk",
-        "name": "Ukrainian"
+        "name": "Ukrainian",
+        "name_zh": "乌克兰语"
     },
     {
         "code": "ur",
-        "name": "Urdu"
+        "name": "Urdu",
+        "name_zh": "乌尔都语"
     },
     {
         "code": "vi",
-        "name": "Vietnamese"
+        "name": "Vietnamese",
+        "name_zh": "越南语"
     },
     {
         "code": "cy",
-        "name": "Welsh"
+        "name": "Welsh",
+        "name_zh": "威尔士语"
     }
 ]

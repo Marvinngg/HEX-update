@@ -22,7 +22,8 @@ private let parakeetLogger = HexLog.parakeet
 struct TranscriptionClient {
   /// Transcribes an audio file at the specified `URL` using the named `model`.
   /// Reports transcription progress via `progressCallback`.
-  var transcribe: @Sendable (URL, String, DecodingOptions, @escaping (Progress) -> Void) async throws -> String
+  /// Optionally accepts hotwords array that will be encoded into promptTokens for WhisperKit models.
+  var transcribe: @Sendable (URL, String, DecodingOptions, [String], @escaping (Progress) -> Void) async throws -> String
 
   /// Ensures a model is downloaded (if missing) and loaded into memory, reporting progress via `progressCallback`.
   var downloadModel: @Sendable (String, @escaping (Progress) -> Void) async throws -> Void
@@ -44,7 +45,7 @@ extension TranscriptionClient: DependencyKey {
   static var liveValue: Self {
     let live = TranscriptionClientLive()
     return Self(
-      transcribe: { try await live.transcribe(url: $0, model: $1, options: $2, progressCallback: $3) },
+      transcribe: { try await live.transcribe(url: $0, model: $1, options: $2, hotwords: $3, progressCallback: $4) },
       downloadModel: { try await live.downloadAndLoadModel(variant: $0, progressCallback: $1) },
       deleteModel: { try await live.deleteModel(variant: $0) },
       isModelDownloaded: { await live.isModelDownloaded($0) },
@@ -99,6 +100,14 @@ actor TranscriptionClientLive {
   /// Ensures the given `variant` model is downloaded and loaded, reporting
   /// overall progress (0%–50% for downloading, 50%–100% for loading).
   func downloadAndLoadModel(variant: String, progressCallback: @escaping (Progress) -> Void) async throws {
+    // If Qwen3-ASR, use Qwen client path
+    if isQwen(variant) {
+      @Dependency(\.qwen3ASR) var qwen
+      try await qwen.downloadModel(variant, progressCallback)
+      currentModelName = variant
+      return
+    }
+
     // If Parakeet, use Parakeet client path
     if isParakeet(variant) {
       try await parakeet.ensureLoaded(modelName: variant, progress: progressCallback)
@@ -151,6 +160,13 @@ actor TranscriptionClientLive {
 
   /// Deletes a model from disk if it exists
   func deleteModel(variant: String) async throws {
+    if isQwen(variant) {
+      @Dependency(\.qwen3ASR) var qwen
+      try await qwen.deleteModel(variant)
+      if currentModelName == variant { currentModelName = nil }
+      return
+    }
+
     if isParakeet(variant) {
       try await parakeet.deleteCaches(modelName: variant)
       if currentModelName == variant { unloadCurrentModel() }
@@ -178,6 +194,11 @@ actor TranscriptionClientLive {
   /// Returns `true` if the model is already downloaded to the local folder.
   /// Performs a thorough check to ensure the model files are actually present and usable.
   func isModelDownloaded(_ modelName: String) async -> Bool {
+    if isQwen(modelName) {
+      @Dependency(\.qwen3ASR) var qwen
+      return await qwen.isModelDownloaded(modelName)
+    }
+
     if isParakeet(modelName) {
       let available = await parakeet.isModelAvailable(modelName)
       parakeetLogger.debug("Parakeet available? \(available)")
@@ -229,6 +250,34 @@ actor TranscriptionClientLive {
     return names
   }
 
+  /// Encodes hotwords into token IDs for WhisperKit prompt
+  private func encodeHotwords(_ hotwords: [String], whisperKit: WhisperKit) -> [Int] {
+    guard !hotwords.isEmpty else { return [] }
+
+    // Try to access the tokenizer from WhisperKit
+    guard let tokenizer = whisperKit.tokenizer else {
+      transcriptionLogger.warning("WhisperKit tokenizer not available, skipping hotwords encoding")
+      return []
+    }
+
+    // Encode each hotword and collect tokens
+    var allTokens: [Int] = []
+    for hotword in hotwords {
+      do {
+        // Encode the hotword text to tokens
+        let tokens = try tokenizer.encode(text: hotword)
+        // Filter out special tokens (they are typically >= specialTokenBegin)
+        let filteredTokens = tokens.filter { $0 < tokenizer.specialTokens.specialTokenBegin }
+        allTokens.append(contentsOf: filteredTokens)
+      } catch {
+        transcriptionLogger.warning("Failed to encode hotword '\(hotword)': \(error.localizedDescription)")
+      }
+    }
+
+    transcriptionLogger.info("Encoded \(hotwords.count) hotwords into \(allTokens.count) tokens")
+    return allTokens
+  }
+
   /// Transcribes the audio file at `url` using a `model` name.
   /// If the model is not yet loaded (or if it differs from the current model), it is downloaded and loaded first.
   /// Transcription progress can be monitored via `progressCallback`.
@@ -236,9 +285,20 @@ actor TranscriptionClientLive {
     url: URL,
     model: String,
     options: DecodingOptions,
+    hotwords: [String],
     progressCallback: @escaping (Progress) -> Void
   ) async throws -> String {
     let startAll = Date()
+
+    // Check if this is a Qwen3-ASR model
+    if isQwen(model) {
+      transcriptionLogger.notice("Using Qwen3-ASR for transcription: \(model)")
+      @Dependency(\.qwen3ASR) var qwen
+      let result = try await qwen.transcribe(url, model, hotwords)
+      transcriptionLogger.info("Qwen3-ASR transcription completed in \(String(format: "%.2f", Date().timeIntervalSince(startAll)))s")
+      return result
+    }
+
     if isParakeet(model) {
       transcriptionLogger.notice("Transcribing with Parakeet model=\(model) file=\(url.lastPathComponent)")
       let startLoad = Date()
@@ -277,10 +337,25 @@ actor TranscriptionClientLive {
       )
     }
 
+    // Encode hotwords if provided
+    var finalOptions = options
+    if !hotwords.isEmpty {
+      transcriptionLogger.info("🔥 Hotwords provided: \(hotwords.joined(separator: ", "))")
+      let promptTokens = encodeHotwords(hotwords, whisperKit: whisperKit)
+      if !promptTokens.isEmpty {
+        finalOptions.promptTokens = promptTokens
+        transcriptionLogger.info("✅ Using \(promptTokens.count) prompt tokens for \(hotwords.count) hotwords")
+      } else {
+        transcriptionLogger.warning("⚠️ Hotwords encoding failed or returned empty tokens")
+      }
+    } else {
+      transcriptionLogger.info("ℹ️ No hotwords provided for this transcription")
+    }
+
     // Perform the transcription.
     transcriptionLogger.notice("Transcribing with WhisperKit model=\(model) file=\(url.lastPathComponent)")
     let startTx = Date()
-    let results = try await whisperKit.transcribe(audioPath: url.path, decodeOptions: options)
+    let results = try await whisperKit.transcribe(audioPath: url.path, decodeOptions: finalOptions)
     transcriptionLogger.info("WhisperKit transcription took \(String(format: "%.2f", Date().timeIntervalSince(startTx)))s")
     transcriptionLogger.info("WhisperKit request total elapsed \(String(format: "%.2f", Date().timeIntervalSince(startAll)))s")
 
@@ -310,6 +385,10 @@ actor TranscriptionClientLive {
 
   private func isParakeet(_ name: String) -> Bool {
     ParakeetModel(rawValue: name) != nil
+  }
+
+  private func isQwen(_ name: String) -> Bool {
+    name.lowercased().hasPrefix("qwen3-asr")
   }
 
   /// Creates or returns the local folder (on disk) for a given `variant` model.

@@ -1,42 +1,62 @@
 [
   {
-    "displayName": "Parakeet TDT v2",
-    "internalName": "parakeet-tdt-0.6b-v2-coreml",
-    "size": "English",
-    "accuracyStars": 5,
-    "speedStars": 5,
-    "storageSize": "650MB"
-  },
-  {
-    "displayName": "Parakeet TDT v3",
-    "internalName": "parakeet-tdt-0.6b-v3-coreml",
-    "size": "Multilingual",
-    "accuracyStars": 5,
-    "speedStars": 5,
-    "storageSize": "650MB"
-  },
-  {
     "displayName": "Whisper Small (Tiny)",
+    "displayName_zh": "Whisper 小型（极小）",
     "internalName": "openai_whisper-tiny",
     "size": "Multilingual",
+    "size_zh": "多语言",
     "accuracyStars": 2,
     "speedStars": 4,
     "storageSize": "73MB"
   },
   {
     "displayName": "Whisper Medium (Base)",
+    "displayName_zh": "Whisper 中型（基础）",
     "internalName": "openai_whisper-base",
     "size": "Multilingual",
+    "size_zh": "多语言",
     "accuracyStars": 3,
     "speedStars": 3,
     "storageSize": "140MB"
   },
   {
-    "displayName": "Whisper Large v3",
-    "internalName": "openai_whisper-large-v3-v20240930",
+    "displayName": "Whisper Small",
+    "displayName_zh": "Whisper 小型",
+    "internalName": "openai_whisper-small",
     "size": "Multilingual",
+    "size_zh": "多语言",
+    "accuracyStars": 3,
+    "speedStars": 3,
+    "storageSize": "466MB"
+  },
+  {
+    "displayName": "Whisper Medium",
+    "displayName_zh": "Whisper 中型",
+    "internalName": "openai_whisper-medium",
+    "size": "Multilingual",
+    "size_zh": "多语言",
     "accuracyStars": 4,
     "speedStars": 2,
     "storageSize": "1.5GB"
+  },
+  {
+    "displayName": "Qwen3-ASR 0.6B",
+    "displayName_zh": "通义千问 ASR 0.6B",
+    "internalName": "qwen3-asr-0.6b",
+    "size": "Multilingual (52 languages)",
+    "size_zh": "多语言（52种语言+22种中文方言）",
+    "accuracyStars": 5,
+    "speedStars": 4,
+    "storageSize": "1.2GB"
+  },
+  {
+    "displayName": "Qwen3-ASR 1.7B",
+    "displayName_zh": "通义千问 ASR 1.7B",
+    "internalName": "qwen3-asr-1.7b",
+    "size": "Multilingual (52 languages)",
+    "size_zh": "多语言（52种语言+22种中文方言）",
+    "accuracyStars": 5,
+    "speedStars": 3,
+    "storageSize": "3.4GB"
   }
 ]

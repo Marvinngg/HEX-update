@@ -91,6 +91,11 @@ struct SettingsFeature {
     case addWordRemapping
     case removeWordRemapping(UUID)
     case setRemappingScratchpadFocused(Bool)
+
+    // Hotwords management
+    case addHotword(String)
+    case deleteHotword(at: Int)
+    case clearAllHotwords
   }
 
   @Dependency(\.keyEventMonitor) var keyEventMonitor
@@ -216,6 +221,27 @@ struct SettingsFeature {
 
       case let .setRemappingScratchpadFocused(isFocused):
         state.$isRemappingScratchpadFocused.withLock { $0 = isFocused }
+        return .none
+
+      case let .addHotword(hotword):
+        state.$hexSettings.withLock {
+          if !$0.hotwords.contains(hotword) {
+            $0.hotwords.append(hotword)
+          }
+        }
+        return .none
+
+      case let .deleteHotword(index):
+        state.$hexSettings.withLock {
+          guard index < $0.hotwords.count else { return }
+          $0.hotwords.remove(at: index)
+        }
+        return .none
+
+      case .clearAllHotwords:
+        state.$hexSettings.withLock {
+          $0.hotwords.removeAll()
+        }
         return .none
 
       case .startSettingPasteLastTranscriptHotkey:

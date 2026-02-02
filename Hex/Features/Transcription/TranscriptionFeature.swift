@@ -52,6 +52,16 @@ struct TranscriptionFeature {
     // Transcription result flow
     case transcriptionResult(String, URL)
     case transcriptionError(Error, URL?)
+    case transcriptionEdited(
+      originalText: String,
+      editedText: String,
+      shouldLearn: Bool,
+      corrections: [TextCorrection],
+      duration: TimeInterval,
+      sourceAppBundleID: String?,
+      sourceAppName: String?,
+      audioURL: URL
+    )
 
     // Model availability
     case modelMissing
@@ -117,6 +127,19 @@ struct TranscriptionFeature {
 
       case let .transcriptionResult(result, audioURL):
         return handleTranscriptionResult(&state, result: result, audioURL: audioURL)
+
+      case let .transcriptionEdited(originalText, editedText, shouldLearn, corrections, duration, sourceAppBundleID, sourceAppName, audioURL):
+        return handleTranscriptionEdited(
+          &state,
+          originalText: originalText,
+          editedText: editedText,
+          shouldLearn: shouldLearn,
+          corrections: corrections,
+          duration: duration,
+          sourceAppBundleID: sourceAppBundleID,
+          sourceAppName: sourceAppName,
+          audioURL: audioURL
+        )
 
       case let .transcriptionError(error, audioURL):
         return handleTranscriptionError(&state, error: error, audioURL: audioURL)
@@ -276,12 +299,9 @@ private extension TranscriptionFeature {
 
 private extension TranscriptionFeature {
   func handleStartRecording(_ state: inout State) -> Effect<Action> {
-    guard state.modelBootstrapState.isModelReady else {
-      return .merge(
-        .send(.modelMissing),
-        .run { _ in soundEffect.play(.cancel) }
-      )
-    }
+    // Note: We don't check isModelReady here because transcription.transcribe()
+    // handles model loading automatically. If there's a real model issue, it will
+    // throw an error that gets handled by handleTranscriptionError.
     state.isRecording = true
     let startTime = Date()
     state.recordingStartTime = startTime
@@ -359,13 +379,18 @@ private extension TranscriptionFeature {
 
         // Create transcription options with the selected language
         // Note: cap concurrency to avoid audio I/O overloads on some Macs
+        @Shared(.hexSettings) var settings: HexSettings
+
         let decodeOptions = DecodingOptions(
           language: language,
           detectLanguage: language == nil, // Only auto-detect if no language specified
-          chunkingStrategy: .vad,
+          chunkingStrategy: .vad
         )
-        
-        let result = try await transcription.transcribe(capturedURL, model, decodeOptions) { _ in }
+
+        // Get hotwords from settings (only used for WhisperKit models)
+        let hotwords = settings.hotwords
+
+        let result = try await transcription.transcribe(capturedURL, model, decodeOptions, hotwords) { _ in }
         
         transcriptionFeatureLogger.notice("Transcribed audio from \(capturedURL.lastPathComponent) to text length \(result.count)")
         await send(.transcriptionResult(result, capturedURL))
@@ -439,22 +464,165 @@ private extension TranscriptionFeature {
     let sourceAppBundleID = state.sourceAppBundleID
     let sourceAppName = state.sourceAppName
     let transcriptionHistory = state.$transcriptionHistory
+    let enableInstantEdit = state.hexSettings.enableInstantEdit
 
-    return .run { send in
-      do {
+    // If instant edit is enabled, show the editor window
+    if enableInstantEdit {
+      @Dependency(\.transcriptEditor) var transcriptEditor
+
+      return .run { [modifiedResult, duration, sourceAppName, audioURL, sourceAppBundleID] send in
+        let result = await transcriptEditor.show(
+          transcript: modifiedResult,
+          duration: duration,
+          sourceAppName: sourceAppName
+        )
+
+        if let result = result {
+          // User confirmed the edit
+          await send(.transcriptionEdited(
+            originalText: modifiedResult,
+            editedText: result.editedText,
+            shouldLearn: result.shouldLearn,
+            corrections: result.corrections,
+            duration: duration,
+            sourceAppBundleID: sourceAppBundleID,
+            sourceAppName: sourceAppName,
+            audioURL: audioURL
+          ))
+        } else {
+          // User cancelled - clean up the audio file
+          try? FileManager.default.removeItem(at: audioURL)
+        }
+      }
+      .cancellable(id: CancelID.transcription)
+    } else {
+      // Direct paste without editing
+      return .run { send in
+        do {
+          try await finalizeRecordingAndStoreTranscript(
+            result: modifiedResult,
+            originalText: nil,
+            corrections: [],
+            duration: duration,
+            sourceAppBundleID: sourceAppBundleID,
+            sourceAppName: sourceAppName,
+            audioURL: audioURL,
+            transcriptionHistory: transcriptionHistory
+          )
+        } catch {
+          await send(.transcriptionError(error, audioURL))
+        }
+      }
+      .cancellable(id: CancelID.transcription)
+    }
+  }
+
+  func handleTranscriptionEdited(
+    _ state: inout State,
+    originalText: String,
+    editedText: String,
+    shouldLearn: Bool,
+    corrections: [TextCorrection],
+    duration: TimeInterval,
+    sourceAppBundleID: String?,
+    sourceAppName: String?,
+    audioURL: URL
+  ) -> Effect<Action> {
+    state.isTranscribing = false
+    state.isPrewarming = false
+
+    let transcriptionHistory = state.$transcriptionHistory
+
+    // Learn from corrections if enabled
+    if shouldLearn && !corrections.isEmpty {
+      @Shared(.hexSettings) var settings: HexSettings
+
+      return .run { _ in
+        // Add corrections to word remappings
+        // Use withLock to safely modify shared settings
+        $settings.withLock { settings in
+          for correction in corrections {
+            // Check if this mapping already exists
+            let exists = settings.wordRemappings.contains { remapping in
+              remapping.match.lowercased() == correction.original.lowercased()
+            }
+
+            if !exists {
+              let newRemapping = WordRemapping(
+                match: correction.original,
+                replacement: correction.corrected
+              )
+              settings.wordRemappings.append(newRemapping)
+              transcriptionFeatureLogger.info("Auto-learned: '\(correction.original)' → '\(correction.corrected)'")
+            }
+
+            // Extract words from the corrected text and add them as hotwords
+            // For Chinese context, we should add the entire corrected phrase if it's not too long
+            // For English context, split by whitespace
+
+            let correctedText = correction.corrected.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            // Check if the corrected text is primarily Chinese
+            let isChinese = correctedText.rangeOfCharacter(from: CharacterSet(charactersIn: "\u{4E00}"..."\u{9FFF}")) != nil
+
+            if isChinese {
+              // For Chinese text: add the entire phrase if it's a reasonable length (2-10 characters)
+              // and not a common phrase
+              let length = correctedText.count
+              if length >= 2 && length <= 10 && !isCommonWord(correctedText) {
+                let correctedLower = correctedText.lowercased()
+                if !settings.hotwords.contains(where: { $0.lowercased() == correctedLower }) {
+                  settings.hotwords.append(correctedText)
+                  transcriptionFeatureLogger.info("Added Chinese hotword: '\(correctedText)' (from correction '\(correction.original)' → '\(correction.corrected)')")
+                }
+              }
+            } else {
+              // For English text: split by whitespace and add individual words
+              let words = correctedText.split(separator: " ").map { String($0).trimmingCharacters(in: .punctuationCharacters) }
+
+              for word in words {
+                // Skip short words (< 3 chars) and common English words
+                guard word.count >= 3, !isCommonWord(word.lowercased()) else { continue }
+
+                let wordLower = word.lowercased()
+                if !settings.hotwords.contains(where: { $0.lowercased() == wordLower }) {
+                  settings.hotwords.append(word)
+                  transcriptionFeatureLogger.info("Added English hotword: '\(word)' (from correction '\(correction.original)' → '\(correction.corrected)')")
+                }
+              }
+            }
+          }
+        }
+
+        // Finalize and save
         try await finalizeRecordingAndStoreTranscript(
-          result: modifiedResult,
+          result: editedText,
+          originalText: originalText,
+          corrections: corrections,
           duration: duration,
           sourceAppBundleID: sourceAppBundleID,
           sourceAppName: sourceAppName,
           audioURL: audioURL,
-          transcriptionHistory: transcriptionHistory
+          transcriptionHistory: transcriptionHistory,
+          fromInstantEdit: true
         )
-      } catch {
-        await send(.transcriptionError(error, audioURL))
+      }
+    } else {
+      // No learning, just save
+      return .run { _ in
+        try await finalizeRecordingAndStoreTranscript(
+          result: editedText,
+          originalText: originalText,
+          corrections: corrections,
+          duration: duration,
+          sourceAppBundleID: sourceAppBundleID,
+          sourceAppName: sourceAppName,
+          audioURL: audioURL,
+          transcriptionHistory: transcriptionHistory,
+          fromInstantEdit: true
+        )
       }
     }
-    .cancellable(id: CancelID.transcription)
   }
 
   func handleTranscriptionError(
@@ -476,22 +644,31 @@ private extension TranscriptionFeature {
   /// Move file to permanent location, create a transcript record, paste text, and play sound.
   func finalizeRecordingAndStoreTranscript(
     result: String,
+    originalText: String?,
+    corrections: [TextCorrection],
     duration: TimeInterval,
     sourceAppBundleID: String?,
     sourceAppName: String?,
     audioURL: URL,
-    transcriptionHistory: Shared<TranscriptionHistory>
+    transcriptionHistory: Shared<TranscriptionHistory>,
+    fromInstantEdit: Bool = false
   ) async throws {
     @Shared(.hexSettings) var hexSettings: HexSettings
 
     if hexSettings.saveTranscriptionHistory {
-      let transcript = try await transcriptPersistence.save(
+      var transcript = try await transcriptPersistence.save(
         result,
         audioURL,
         duration,
         sourceAppBundleID,
         sourceAppName
       )
+
+      // Add edit information if available
+      if let originalText = originalText, originalText != result {
+        transcript.originalText = originalText
+        transcript.corrections = corrections
+      }
 
       transcriptionHistory.withLock { history in
         history.history.insert(transcript, at: 0)
@@ -510,8 +687,105 @@ private extension TranscriptionFeature {
       try? FileManager.default.removeItem(at: audioURL)
     }
 
-    await pasteboard.paste(result)
-    soundEffect.play(.pasteTranscript)
+    // For instant edit: always copy to clipboard AND try to insert
+    if fromInstantEdit {
+      // 1. Copy to clipboard as backup
+      await pasteboard.copy(result)
+      transcriptionFeatureLogger.info("Copied transcription to clipboard")
+
+      // 2. Try to insert into active input field
+      let success = await attemptDirectInsert(result)
+      if success {
+        transcriptionFeatureLogger.info("Successfully inserted transcription")
+        soundEffect.play(.pasteTranscript)
+      } else {
+        transcriptionFeatureLogger.warning("Failed to auto-insert, but text is in clipboard")
+        soundEffect.play(.pasteTranscript)
+      }
+    } else {
+      // Normal transcription flow - use user settings
+      await pasteboard.paste(result)
+      soundEffect.play(.pasteTranscript)
+    }
+  }
+
+  /// Checks if a word is a common English/Chinese word that shouldn't be added as a hotword
+  private func isCommonWord(_ word: String) -> Bool {
+    let commonWords: Set<String> = [
+      // English common words
+      "the", "and", "for", "are", "but", "not", "you", "all", "can", "her", "was", "one",
+      "our", "out", "day", "get", "has", "him", "his", "how", "man", "new", "now", "old",
+      "see", "two", "way", "who", "boy", "did", "its", "let", "put", "say", "she", "too",
+      "use", "that", "this", "with", "have", "from", "they", "will", "what", "when", "make",
+      "like", "time", "just", "know", "take", "people", "into", "year", "your", "good",
+      "some", "could", "them", "than", "then", "these", "very", "about", "would", "there",
+      "their", "which", "also", "been", "were", "said", "each", "should", "other", "only",
+      "such", "being", "after", "before", "because", "through", "where", "while", "does",
+
+      // Chinese common single characters
+      "的", "是", "在", "了", "和", "有", "我", "他", "她", "它", "这", "那", "你", "吗", "啊", "呢",
+      "吧", "啦", "哦", "嗯", "哈", "呀", "嘛", "哟", "喔", "诶",
+
+      // Chinese common 2-character words
+      "我们", "他们", "她们", "它们", "什么", "怎么", "为什么", "可以", "不是", "没有", "还是",
+      "如果", "因为", "所以", "但是", "而且", "或者", "那么", "这样", "那样", "一个", "一些",
+      "很多", "非常", "特别", "已经", "还有", "知道", "觉得", "认为", "应该", "可能", "需要",
+      "希望", "想要", "喜欢", "看到", "听到", "说话", "做事", "时候", "地方", "东西", "事情",
+      "问题", "方法", "办法", "情况", "状态", "结果", "原因", "开始", "结束", "继续", "停止",
+
+      // Chinese common 3-character words
+      "不知道", "不一定", "不一样", "有一点", "有时候", "没关系", "不客气", "对不起", "不好意思",
+      "不可能", "很可能", "怎么样", "为什么", "是不是", "好不好", "行不行", "可不可以",
+
+      // Chinese common 4+ character phrases
+      "不好意思", "没关系的", "不要紧的", "无所谓的", "没问题的", "可以的话", "如果可以",
+      "应该没有", "可能没有", "肯定没有", "一定要的", "必须要的"
+    ]
+    return commonWords.contains(word)
+  }
+
+  /// Attempts to directly insert text into the focused input field
+  private func attemptDirectInsert(_ text: String) async -> Bool {
+    // Wait a bit for the window to close and focus to return to the original app
+    try? await Task.sleep(for: .milliseconds(200))
+
+    transcriptionFeatureLogger.info("Attempting to insert text via Accessibility API")
+
+    // Try Accessibility API first (most reliable)
+    do {
+      try PasteboardClientLive.insertTextAtCursor(text)
+      transcriptionFeatureLogger.info("✅ Successfully inserted via Accessibility API")
+      return true
+    } catch {
+      transcriptionFeatureLogger.warning("❌ Accessibility API failed: \(error.localizedDescription)")
+    }
+
+    // Fallback: try Cmd+V (text is already in clipboard)
+    transcriptionFeatureLogger.info("Attempting to insert text via Cmd+V")
+
+    let source = CGEventSource(stateID: .combinedSessionState)
+    guard let source = source else {
+      transcriptionFeatureLogger.error("Failed to create CGEventSource")
+      return false
+    }
+
+    let vKey = CGKeyCode(9) // V key
+    let cmdKey = CGKeyCode(55) // Cmd key
+
+    let cmdDown = CGEvent(keyboardEventSource: source, virtualKey: cmdKey, keyDown: true)
+    let vDown = CGEvent(keyboardEventSource: source, virtualKey: vKey, keyDown: true)
+    vDown?.flags = .maskCommand
+    let vUp = CGEvent(keyboardEventSource: source, virtualKey: vKey, keyDown: false)
+    vUp?.flags = .maskCommand
+    let cmdUp = CGEvent(keyboardEventSource: source, virtualKey: cmdKey, keyDown: false)
+
+    cmdDown?.post(tap: .cghidEventTap)
+    vDown?.post(tap: .cghidEventTap)
+    vUp?.post(tap: .cghidEventTap)
+    cmdUp?.post(tap: .cghidEventTap)
+
+    transcriptionFeatureLogger.info("✅ Posted Cmd+V events")
+    return true
   }
 }
 

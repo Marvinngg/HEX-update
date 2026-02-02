@@ -10,13 +10,19 @@ struct CuratedList: View {
 		if store.showAllModels {
 			return Array(store.curatedModels)
 		} else {
-			// Show only Parakeet by default
-			return store.curatedModels.filter { $0.internalName.hasPrefix("parakeet-") }
+			// Show recommended models by default: Whisper Base and Qwen3-ASR 0.6B
+			return store.curatedModels.filter { model in
+				model.internalName == "openai_whisper-base" ||
+				model.internalName == "qwen3-asr-0.6b"
+			}
 		}
 	}
 
 	private var hiddenModels: [CuratedModelInfo] {
-		store.curatedModels.filter { !$0.internalName.hasPrefix("parakeet-") }
+		store.curatedModels.filter { model in
+			model.internalName != "openai_whisper-base" &&
+			model.internalName != "qwen3-asr-0.6b"
+		}
 	}
 
 	var body: some View {

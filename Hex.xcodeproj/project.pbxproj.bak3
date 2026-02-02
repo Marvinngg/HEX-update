@@ -173,6 +173,13 @@
 				476316262E5FB31400913CDE /* HexCore */,
 				47E16A612EC6C9D300885CF7 /* FluidAudio */,
 				5860B6A82F30860500C8E16A /* MLXAudio */,
+				5860B6AA2F30860500C8E16A /* MLXAudioCodecs */,
+				5860B6AC2F30860500C8E16A /* MLXAudioCore */,
+				5860B6AE2F30860500C8E16A /* MLXAudioSTS */,
+				5860B6B02F30860500C8E16A /* MLXAudioSTT */,
+				5860B6B22F30860500C8E16A /* MLXAudioTTS */,
+				5860B6B42F30860500C8E16A /* MLXAudioUI */,
+				5860B6B62F30860500C8E16A /* mlx-audio-swift-tts */,
 			);
 			productName = Hex;
 			productReference = 47E05DEE2D444EC600D26DA6 /* Hex Debug.app */;
@@ -713,6 +720,41 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 5860B6A72F30860500C8E16A /* XCRemoteSwiftPackageReference "mlx-audio-swift" */;
 			productName = MLXAudio;
+		};
+		5860B6AA2F30860500C8E16A /* MLXAudioCodecs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5860B6A72F30860500C8E16A /* XCRemoteSwiftPackageReference "mlx-audio-swift" */;
+			productName = MLXAudioCodecs;
+		};
+		5860B6AC2F30860500C8E16A /* MLXAudioCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5860B6A72F30860500C8E16A /* XCRemoteSwiftPackageReference "mlx-audio-swift" */;
+			productName = MLXAudioCore;
+		};
+		5860B6AE2F30860500C8E16A /* MLXAudioSTS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5860B6A72F30860500C8E16A /* XCRemoteSwiftPackageReference "mlx-audio-swift" */;
+			productName = MLXAudioSTS;
+		};
+		5860B6B02F30860500C8E16A /* MLXAudioSTT */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5860B6A72F30860500C8E16A /* XCRemoteSwiftPackageReference "mlx-audio-swift" */;
+			productName = MLXAudioSTT;
+		};
+		5860B6B22F30860500C8E16A /* MLXAudioTTS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5860B6A72F30860500C8E16A /* XCRemoteSwiftPackageReference "mlx-audio-swift" */;
+			productName = MLXAudioTTS;
+		};
+		5860B6B42F30860500C8E16A /* MLXAudioUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5860B6A72F30860500C8E16A /* XCRemoteSwiftPackageReference "mlx-audio-swift" */;
+			productName = MLXAudioUI;
+		};
+		5860B6B62F30860500C8E16A /* mlx-audio-swift-tts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5860B6A72F30860500C8E16A /* XCRemoteSwiftPackageReference "mlx-audio-swift" */;
+			productName = "mlx-audio-swift-tts";
 		};
 		B5045C962D78DED500D0A119 /* MarkdownUI */ = {
 			isa = XCSwiftPackageProductDependency;

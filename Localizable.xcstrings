@@ -5,7 +5,14 @@
       "shouldTranslate" : false
     },
     "(%@)" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(%@)"
+          }
+        }
+      }
     },
     "%@ %@" : {
       "localizations" : {
@@ -14,26 +21,70 @@
             "state" : "new",
             "value" : "%1$@ %2$@"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
         }
       }
+    },
+    "%lld 个热词" : {
+
     },
     "•" : {
       "shouldTranslate" : false
     },
     "50" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "50"
+          }
+        }
+      }
     },
     "100" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "100"
+          }
+        }
+      }
     },
     "200" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "200"
+          }
+        }
+      }
     },
     "500" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "500"
+          }
+        }
+      }
     },
     "1000" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1000"
+          }
+        }
+      }
     },
     "About" : {
       "comment" : "Settings -> About Section headline",
@@ -42,6 +93,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Über"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关于"
           }
         }
       }
@@ -55,20 +112,44 @@
             "state" : "translated",
             "value" : "Bedienungshilfen"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "辅助功能"
+          }
         }
       }
     },
     "Accuracy" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "准确度"
+          }
+        }
+      }
     },
     "Add Remapping" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加重映射"
+          }
+        }
+      }
     },
     "Add Removal" : {
-
-    },
-    "Advanced" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加移除规则"
+          }
+        }
+      }
     },
     "Are you sure you want to delete all transcripts? This action cannot be undone." : {
       "comment" : "Delete transcript history confirm",
@@ -78,17 +159,44 @@
             "state" : "translated",
             "value" : "Bist du sicher, dass du alle Transkriptionen löschen möchtest? Das kann nicht gängig gemacht werden."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您确定要删除所有转录记录吗？此操作无法撤销。"
+          }
         }
       }
     },
     "Assign a shortcut (modifier + key) to instantly paste your last transcription." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置快捷键（修饰键 + 按键）以快速粘贴上次的转录内容。"
+          }
+        }
+      }
     },
     "Audio Behavior while Recording" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录音时的音频行为"
+          }
+        }
+      }
     },
     "Become a Sponsor" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "成为赞助者"
+          }
+        }
+      }
     },
     "Cancel" : {
       "comment" : "Cancel deleting All Transcripts",
@@ -98,11 +206,24 @@
             "state" : "translated",
             "value" : "Abbrechen"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
         }
       }
     },
     "Cancel Download" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消下载"
+          }
+        }
+      }
     },
     "Changelog" : {
       "localizations" : {
@@ -110,6 +231,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Änderungen"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新日志"
           }
         }
       }
@@ -120,6 +247,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Änderungen konnten nicht geladen werden."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法加载更新日志。"
           }
         }
       }
@@ -132,6 +265,12 @@
             "state" : "translated",
             "value" : "Nach Updates suchen"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "检查更新"
+          }
         }
       }
     },
@@ -143,11 +282,24 @@
             "state" : "translated",
             "value" : "Suche nach Updates…"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "检查更新…"
+          }
         }
       }
     },
     "Clear shortcut" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除快捷键"
+          }
+        }
+      }
     },
     "Close" : {
       "localizations" : {
@@ -155,6 +307,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Schließen"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭"
+          }
+        }
+      }
+    },
+    "Confirm & Paste" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确认并粘贴"
           }
         }
       }
@@ -167,6 +335,12 @@
             "state" : "translated",
             "value" : "Kopiert"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已复制"
+          }
         }
       }
     },
@@ -178,14 +352,34 @@
             "state" : "translated",
             "value" : "In die Zwischenablage kopieren"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "复制到剪贴板"
+          }
         }
       }
     },
     "Copy transcription text to clipboard in addition to pasting it" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "除了粘贴外，同时复制转录文本到剪贴板"
+          }
+        }
+      }
     },
     "Delete" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除"
+          }
+        }
+      }
     },
     "Delete All" : {
       "comment" : "Delete all transcriptions from history.",
@@ -194,6 +388,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alle löschen"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全部删除"
           }
         }
       }
@@ -205,6 +405,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alle Transkriptionen löschen"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除所有转录"
           }
         }
       }
@@ -218,6 +424,12 @@
             "state" : "translated",
             "value" : "Ausgewähltes Modell löschen"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除所选模型"
+          }
         }
       }
     },
@@ -229,14 +441,34 @@
             "state" : "translated",
             "value" : "Transkription löschen"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除转录"
+          }
         }
       }
     },
     "Do Nothing" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不做任何操作"
+          }
+        }
+      }
     },
     "Download" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载"
+          }
+        }
+      }
     },
     "Download Error: %@" : {
       "comment" : "Model download error.",
@@ -245,6 +477,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Downloadfehler: %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载错误：%@"
           }
         }
       }
@@ -258,11 +496,24 @@
             "state" : "translated",
             "value" : "Ausgewähltes Modell herunterladen"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载所选模型"
+          }
         }
       }
     },
     "Downloaded" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已下载"
+          }
+        }
+      }
     },
     "Downloading %@..." : {
       "comment" : "In Transcription Model section in settings.",
@@ -273,17 +524,54 @@
             "state" : "translated",
             "value" : "Lade %@ herunter"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在下载 %@..."
+          }
         }
       }
     },
     "Downloading… %lld%%" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在下载… %lld%%"
+          }
+        }
+      }
+    },
+    "Edited" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已编辑"
+          }
+        }
+      }
     },
     "Enable in Settings" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在设置中启用"
+          }
+        }
+      }
     },
     "Enable Word Removals" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "启用词语移除"
+          }
+        }
+      }
     },
     "Ensure Hex can access your microphone and system accessibility features." : {
       "comment" : "Footer for permissions section in settings",
@@ -293,6 +581,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sicherstellen, dass Hex dein Mikrofon und Systemweite Bedienungshilfen benutzen kann."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确保 Hex 可以访问您的麦克风和系统辅助功能。"
           }
         }
       }
@@ -305,14 +599,14 @@
             "state" : "translated",
             "value" : "Eingabe einer Tastenkombination"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入组合键"
+          }
         }
       }
-    },
-    "Export Logs" : {
-
-    },
-    "Exporting Logs…" : {
-
     },
     "General" : {
       "comment" : "General section in Settings Header.",
@@ -322,11 +616,24 @@
             "state" : "translated",
             "value" : "Allgemein"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通用"
+          }
         }
       }
     },
     "Grant" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "授予"
+          }
+        }
+      }
     },
     "Granted" : {
       "comment" : "Label title for granted permissions.",
@@ -336,6 +643,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zugelassen"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已授权"
           }
         }
       }
@@ -348,6 +661,12 @@
             "state" : "translated",
             "value" : "Hex ist Open Source"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hex 是开源软件"
+          }
         }
       }
     },
@@ -359,11 +678,24 @@
             "state" : "translated",
             "value" : "Transkriptionsaktivitäten"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "历史记录"
+          }
         }
       }
     },
     "History Disabled" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "历史记录已禁用"
+          }
+        }
+      }
     },
     "Hot Key" : {
       "comment" : "hotkey section in settings.",
@@ -372,6 +704,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tassenkombination"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "热键"
           }
         }
       }
@@ -383,20 +721,54 @@
             "state" : "translated",
             "value" : "Unter %0.1fs ignorieren"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "忽略低于 %.1f 秒"
+          }
         }
       }
     },
     "Input Device" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入设备"
+          }
+        }
+      }
     },
     "Input Monitoring is required so Hex can listen for your hotkey." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要输入监控权限，以便 Hex 可以监听您的热键。"
+          }
+        }
+      }
     },
     "Match" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "匹配"
+          }
+        }
+      }
     },
     "Maximum History Entries" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最大历史记录条数"
+          }
+        }
+      }
     },
     "Microphone" : {
       "comment" : "Microphone permission.",
@@ -407,23 +779,64 @@
             "state" : "translated",
             "value" : "Mikrofon"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "麦克风"
+          }
         }
       }
     },
     "Microphone Selection" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "麦克风选择"
+          }
+        }
+      }
     },
     "Model prewarming..." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型预热中..."
+          }
+        }
+      }
     },
     "Modification Type" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修改类型"
+          }
+        }
+      }
     },
     "Modifier side" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修饰键位置"
+          }
+        }
+      }
     },
     "Mute Volume" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "静音音量"
+          }
+        }
+      }
     },
     "No models found." : {
       "comment" : "Replacement text in transcription model section when no available models are found",
@@ -433,6 +846,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keine Modelle gefunden."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未找到模型。"
           }
         }
       }
@@ -445,20 +864,54 @@
             "state" : "translated",
             "value" : "Keine Transkriptionen"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无转录记录"
+          }
         }
       }
     },
     "Not set" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未设置"
+          }
+        }
+      }
     },
     "Oldest entries will be automatically deleted when limit is reached" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "达到限制时将自动删除最旧的记录"
+          }
+        }
+      }
     },
     "On" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开启"
+          }
+        }
+      }
     },
     "Open Input Monitoring Settings" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开输入监控设置"
+          }
+        }
+      }
     },
     "Open on Login" : {
       "comment" : "Label for general setting to open app on login.",
@@ -467,6 +920,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bei Anmeldung öffnen"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登录时打开"
           }
         }
       }
@@ -479,20 +938,54 @@
             "state" : "translated",
             "value" : "Ausgabesprache"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输出语言"
+          }
         }
       }
     },
     "Override the system default microphone with a specific input device. This setting will persist across sessions." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用特定输入设备覆盖系统默认麦克风。此设置将在多次使用之间保持。"
+          }
+        }
+      }
     },
     "Paste Last Transcript" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "粘贴上次转录"
+          }
+        }
+      }
     },
     "Pattern" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模式"
+          }
+        }
+      }
     },
     "Pause Media" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂停媒体"
+          }
+        }
+      }
     },
     "Pause Media while Recording" : {
       "comment" : "Label for general setting whether to pause media while recording.",
@@ -502,6 +995,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Medien während der Aufnahme pausieren"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录音时暂停媒体"
           }
         }
       }
@@ -514,6 +1013,12 @@
             "state" : "translated",
             "value" : "Berechtigungen"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "权限"
+          }
         }
       }
     },
@@ -524,6 +1029,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Audio abspielen"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "播放音频"
           }
         }
       }
@@ -536,32 +1047,104 @@
             "state" : "translated",
             "value" : "Systemschlaf während der Aufnahme verhindern"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "录音时防止系统休眠"
+          }
         }
       }
     },
     "Preview" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "预览"
+          }
+        }
+      }
     },
     "Quit" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退出"
+          }
+        }
+      }
     },
     "Refresh available input devices" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刷新可用输入设备"
+          }
+        }
+      }
     },
     "Regex Pattern" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正则表达式模式"
+          }
+        }
+      }
+    },
+    "Remember my corrections and learn" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记住我的更正并学习"
+          }
+        }
+      }
     },
     "Remove filler words using case-insensitive regex patterns." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用不区分大小写的正则表达式模式移除填充词。"
+          }
+        }
+      }
     },
     "Remove or replace words in every transcript. Removals use regex patterns and match whole words." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在每次转录中移除或替换词语。移除使用正则表达式模式并匹配完整单词。"
+          }
+        }
+      }
     },
     "Replace" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "替换"
+          }
+        }
+      }
     },
     "Replace specific words in every transcript. Matches whole words, case-insensitive, in order." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在每次转录中替换特定词语。按顺序匹配完整单词，不区分大小写。"
+          }
+        }
+      }
     },
     "Request Permission" : {
       "comment" : "Button texts for requesting permissions in settings.",
@@ -572,29 +1155,64 @@
             "state" : "translated",
             "value" : "Erlaubnis anfordern"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请求权限"
+          }
         }
       }
     },
     "Save Transcription History" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存转录历史"
+          }
+        }
+      }
     },
     "Save transcriptions and audio recordings for later access" : {
-
-    },
-    "Saved to %@" : {
-
-    },
-    "Saves the last 30 minutes of Hex diagnostics so you can share them with support." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存转录和音频录制以供后续访问"
+          }
+        }
+      }
     },
     "Say something…" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "说点什么…"
+          }
+        }
+      }
     },
     "Scratchpad" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "便签本"
+          }
+        }
+      }
     },
     "Selected device not connected. System default will be used." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选设备未连接。将使用系统默认设备。"
+          }
+        }
+      }
     },
     "Selected Model" : {
       "comment" : "Label for selecting which model is active",
@@ -604,6 +1222,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modell auswählen"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选模型"
           }
         }
       }
@@ -616,6 +1240,12 @@
             "state" : "translated",
             "value" : "Einstellungen"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置"
+          }
         }
       }
     },
@@ -627,6 +1257,12 @@
             "state" : "translated",
             "value" : "Einstellungen…"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置…"
+          }
         }
       }
     },
@@ -636,6 +1272,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Änderungen anzeigen"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示更新日志"
           }
         }
       }
@@ -648,17 +1290,44 @@
             "state" : "translated",
             "value" : "Dock-Symbol anzeigen"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示程序坞图标"
+          }
         }
       }
     },
     "Show in Finder" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在访达中显示"
+          }
+        }
+      }
     },
     "Show less" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示更少"
+          }
+        }
+      }
     },
     "Show more" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示更多"
+          }
+        }
+      }
     },
     "Sound" : {
       "comment" : "sound section in general settings.",
@@ -667,6 +1336,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ton"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "声音"
           }
         }
       }
@@ -679,11 +1354,24 @@
             "state" : "translated",
             "value" : "Ton-Effekte"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "声音效果"
+          }
         }
       }
     },
     "Speed" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "速度"
+          }
+        }
+      }
     },
     "Stop playback" : {
       "comment" : "Help text for play button in history view.",
@@ -693,17 +1381,44 @@
             "state" : "translated",
             "value" : "Wiedergabe anhalten."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止播放"
+          }
         }
       }
     },
     "Support the developer" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "支持开发者"
+          }
+        }
+      }
     },
     "Transcript Modifications" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "转录修改"
+          }
+        }
+      }
     },
     "Transcription history is currently disabled." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "转录历史记录当前已禁用。"
+          }
+        }
+      }
     },
     "Transcription Model" : {
       "comment" : "Label for Transcription Model Section",
@@ -713,17 +1428,54 @@
             "state" : "translated",
             "value" : "Transkriptionsmodell"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "转录模型"
+          }
+        }
+      }
+    },
+    "Transcription Result" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "转录结果"
+          }
         }
       }
     },
     "Transforms" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "转换"
+          }
+        }
+      }
     },
     "Unlimited" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无限制"
+          }
+        }
+      }
     },
     "Use at least one modifier (⌘, ⌥, ⇧, ⌃) plus a key." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "至少使用一个修饰键（⌘、⌥、⇧、⌃）加上一个按键。"
+          }
+        }
+      }
     },
     "Use clipboard to insert" : {
       "comment" : "Label for toggle in general section.",
@@ -732,6 +1484,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zwischenablage zum Einfügen verwenden"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用剪贴板插入"
           }
         }
       }
@@ -744,11 +1502,24 @@
             "state" : "translated",
             "value" : "Zwischenablage zum Einfügen von Text benutzen. Schnell, aber möglicherweise wird nicht der gesamte Inhalt der Zwischenablage wiederhergestellt.\nAusschalten, um simulierte Tasteneingaben zu verwenden. Langsamer, aber muss die Zwischenablage nicht wiederherstellen."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用剪贴板插入文本。速度快，但可能无法恢复所有剪贴板内容。\n关闭此选项以使用模拟按键。速度较慢，但无需恢复剪贴板。"
+          }
         }
       }
     },
     "Use double-tap only" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅使用双击"
+          }
+        }
+      }
     },
     "Version" : {
       "comment" : "Label for version in About section.",
@@ -757,6 +1528,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "版本"
           }
         }
       }
@@ -769,20 +1546,54 @@
             "state" : "translated",
             "value" : "Besuche unser GitHub"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "访问我们的 GitHub"
+          }
         }
       }
     },
     "Volume" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "音量"
+          }
+        }
+      }
     },
     "When disabled, transcriptions will not be saved and audio files will be deleted immediately after transcription." : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "禁用时，转录内容将不会保存，音频文件将在转录后立即删除。"
+          }
+        }
+      }
     },
     "Word Remappings" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "词语重映射"
+          }
+        }
+      }
     },
     "Word Removals" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "词语移除"
+          }
+        }
+      }
     },
     "Your transcription history will appear here." : {
       "comment" : "Empty history subtitle.",
@@ -792,8 +1603,56 @@
             "state" : "translated",
             "value" : "Deine Transkriptionsaktivitäten werden hier angezeigt werden"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您的转录历史将显示在此处。"
+          }
         }
       }
+    },
+    "修改的词汇:" : {
+
+    },
+    "修改详情" : {
+
+    },
+    "删除热词" : {
+
+    },
+    "取消" : {
+
+    },
+    "已编辑" : {
+
+    },
+    "暂无热词，点击下方按钮添加" : {
+
+    },
+    "添加" : {
+
+    },
+    "添加专业词汇、人名等，提高转录准确率。修改转录文本时会自动学习。" : {
+
+    },
+    "添加热词" : {
+
+    },
+    "清空全部" : {
+
+    },
+    "点击查看修改详情" : {
+
+    },
+    "热词" : {
+
+    },
+    "热词列表" : {
+
+    },
+    "输入热词" : {
+
     }
   },
   "version" : "1.0"

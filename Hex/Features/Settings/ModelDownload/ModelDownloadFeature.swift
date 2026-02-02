@@ -28,8 +28,10 @@ public struct ModelInfo: Equatable, Identifiable {
 
 public struct CuratedModelInfo: Equatable, Identifiable, Codable {
 	public let displayName: String
+	public let displayName_zh: String?
 	public let internalName: String
 	public let size: String
+	public let size_zh: String?
 	public let accuracyStars: Int
 	public let speedStars: Int
 	public let storageSize: String
@@ -41,22 +43,28 @@ public struct CuratedModelInfo: Equatable, Identifiable, Codable {
 			return "BEST FOR ENGLISH"
 		} else if internalName == "parakeet-tdt-0.6b-v3-coreml" {
 			return "BEST FOR MULTILINGUAL"
+		} else if internalName.hasPrefix("qwen3-asr") {
+			return "BEST FOR CHINESE"
 		}
 		return nil
 	}
 
 	public init(
 		displayName: String,
+		displayName_zh: String? = nil,
 		internalName: String,
 		size: String,
+		size_zh: String? = nil,
 		accuracyStars: Int,
 		speedStars: Int,
 		storageSize: String,
 		isDownloaded: Bool
 	) {
 		self.displayName = displayName
+		self.displayName_zh = displayName_zh
 		self.internalName = internalName
 		self.size = size
+		self.size_zh = size_zh
 		self.accuracyStars = accuracyStars
 		self.speedStars = speedStars
 		self.storageSize = storageSize
@@ -64,12 +72,14 @@ public struct CuratedModelInfo: Equatable, Identifiable, Codable {
 	}
 
 	// Codable (isDownloaded is set at runtime)
-	private enum CodingKeys: String, CodingKey { case displayName, internalName, size, accuracyStars, speedStars, storageSize }
+	private enum CodingKeys: String, CodingKey { case displayName, displayName_zh, internalName, size, size_zh, accuracyStars, speedStars, storageSize }
 	public init(from decoder: Decoder) throws {
 		let c = try decoder.container(keyedBy: CodingKeys.self)
 		displayName = try c.decode(String.self, forKey: .displayName)
+		displayName_zh = try c.decodeIfPresent(String.self, forKey: .displayName_zh)
 		internalName = try c.decode(String.self, forKey: .internalName)
 		size = try c.decode(String.self, forKey: .size)
+		size_zh = try c.decodeIfPresent(String.self, forKey: .size_zh)
 		accuracyStars = try c.decode(Int.self, forKey: .accuracyStars)
 		speedStars = try c.decode(Int.self, forKey: .speedStars)
 		storageSize = try c.decode(String.self, forKey: .storageSize)
