@@ -536,13 +536,59 @@ private extension TranscriptionFeature {
     // Learn from corrections if enabled
     if shouldLearn && !corrections.isEmpty {
       @Shared(.hexSettings) var settings: HexSettings
+      @Dependency(\.llmAnalysis) var llmAnalysis
 
       return .run { _ in
+        // Choose analysis mode based on user settings
+        let finalCorrections: [TextCorrection]
+        let hotwords: [String]
+
+        switch settings.correctionAnalysisMode {
+        case .traditional:
+          // Use traditional algorithm for everything
+          finalCorrections = corrections
+          let commonWords = getCommonWords()
+          hotwords = TextDiffAlgorithm.extractHotwords(from: corrections, commonWords: commonWords)
+          transcriptionFeatureLogger.info("Using traditional algorithm for corrections and hotwords")
+
+        case .llm:
+          // Use LLM analysis for everything
+          if settings.llmConfig.enabled && settings.llmConfig.isValid {
+            do {
+              let request = LLMAnalysisRequest(
+                originalText: originalText,
+                editedText: editedText,
+                language: nil
+              )
+              let response = try await llmAnalysis.analyzeCorrections(request, settings.llmConfig)
+
+              // Use LLM-detected corrections instead of traditional ones
+              finalCorrections = response.corrections
+              hotwords = response.hotwords
+
+              transcriptionFeatureLogger.info("✅ LLM analysis complete")
+              transcriptionFeatureLogger.info("Detected \(finalCorrections.count) corrections: \(finalCorrections.map { "\($0.original)→\($0.corrected)" }.joined(separator: ", "))")
+              transcriptionFeatureLogger.info("Extracted \(hotwords.count) hotwords: \(hotwords.joined(separator: ", "))")
+              if let reasoning = response.reasoning {
+                transcriptionFeatureLogger.debug("LLM reasoning: \(reasoning)")
+              }
+            } catch {
+              transcriptionFeatureLogger.error("LLM analysis failed, falling back to traditional: \(error.localizedDescription)")
+              finalCorrections = corrections
+              let commonWords = getCommonWords()
+              hotwords = TextDiffAlgorithm.extractHotwords(from: corrections, commonWords: commonWords)
+            }
+          } else {
+            transcriptionFeatureLogger.warning("LLM not configured, falling back to traditional")
+            finalCorrections = corrections
+            let commonWords = getCommonWords()
+            hotwords = TextDiffAlgorithm.extractHotwords(from: corrections, commonWords: commonWords)
+          }
+        }
+
         // Add corrections to word remappings
-        // Use withLock to safely modify shared settings
         $settings.withLock { settings in
-          for correction in corrections {
-            // Check if this mapping already exists
+          for correction in finalCorrections {
             let exists = settings.wordRemappings.contains { remapping in
               remapping.match.lowercased() == correction.original.lowercased()
             }
@@ -553,43 +599,18 @@ private extension TranscriptionFeature {
                 replacement: correction.corrected
               )
               settings.wordRemappings.append(newRemapping)
-              transcriptionFeatureLogger.info("Auto-learned: '\(correction.original)' → '\(correction.corrected)'")
+              transcriptionFeatureLogger.info("Auto-learned word remapping: '\(correction.original)' → '\(correction.corrected)'")
             }
+          }
+        }
 
-            // Extract words from the corrected text and add them as hotwords
-            // For Chinese context, we should add the entire corrected phrase if it's not too long
-            // For English context, split by whitespace
-
-            let correctedText = correction.corrected.trimmingCharacters(in: .whitespacesAndNewlines)
-
-            // Check if the corrected text is primarily Chinese
-            let isChinese = correctedText.rangeOfCharacter(from: CharacterSet(charactersIn: "\u{4E00}"..."\u{9FFF}")) != nil
-
-            if isChinese {
-              // For Chinese text: add the entire phrase if it's a reasonable length (2-10 characters)
-              // and not a common phrase
-              let length = correctedText.count
-              if length >= 2 && length <= 10 && !isCommonWord(correctedText) {
-                let correctedLower = correctedText.lowercased()
-                if !settings.hotwords.contains(where: { $0.lowercased() == correctedLower }) {
-                  settings.hotwords.append(correctedText)
-                  transcriptionFeatureLogger.info("Added Chinese hotword: '\(correctedText)' (from correction '\(correction.original)' → '\(correction.corrected)')")
-                }
-              }
-            } else {
-              // For English text: split by whitespace and add individual words
-              let words = correctedText.split(separator: " ").map { String($0).trimmingCharacters(in: .punctuationCharacters) }
-
-              for word in words {
-                // Skip short words (< 3 chars) and common English words
-                guard word.count >= 3, !isCommonWord(word.lowercased()) else { continue }
-
-                let wordLower = word.lowercased()
-                if !settings.hotwords.contains(where: { $0.lowercased() == wordLower }) {
-                  settings.hotwords.append(word)
-                  transcriptionFeatureLogger.info("Added English hotword: '\(word)' (from correction '\(correction.original)' → '\(correction.corrected)')")
-                }
-              }
+        // Add hotwords to settings
+        $settings.withLock { settings in
+          for hotword in hotwords {
+            let hotwordLower = hotword.lowercased()
+            if !settings.hotwords.contains(where: { $0.lowercased() == hotwordLower }) {
+              settings.hotwords.append(hotword)
+              transcriptionFeatureLogger.info("Auto-learned hotword: '\(hotword)'")
             }
           }
         }
@@ -709,9 +730,9 @@ private extension TranscriptionFeature {
     }
   }
 
-  /// Checks if a word is a common English/Chinese word that shouldn't be added as a hotword
-  private func isCommonWord(_ word: String) -> Bool {
-    let commonWords: Set<String> = [
+  /// Returns set of common English/Chinese words that shouldn't be added as hotwords
+  private func getCommonWords() -> Set<String> {
+    return [
       // English common words
       "the", "and", "for", "are", "but", "not", "you", "all", "can", "her", "was", "one",
       "our", "out", "day", "get", "has", "him", "his", "how", "man", "new", "now", "old",
@@ -741,7 +762,6 @@ private extension TranscriptionFeature {
       "不好意思", "没关系的", "不要紧的", "无所谓的", "没问题的", "可以的话", "如果可以",
       "应该没有", "可能没有", "肯定没有", "一定要的", "必须要的"
     ]
-    return commonWords.contains(word)
   }
 
   /// Attempts to directly insert text into the focused input field

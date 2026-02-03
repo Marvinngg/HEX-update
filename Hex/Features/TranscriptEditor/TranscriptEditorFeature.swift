@@ -54,6 +54,7 @@ struct TranscriptEditorFeature {
 		case binding(BindingAction<State>)
 		case confirmTapped
 		case cancelTapped
+		case correctionsDetected([TextCorrection])
 		case delegate(Delegate)
 
 		enum Delegate {
@@ -63,6 +64,7 @@ struct TranscriptEditorFeature {
 	}
 
 	@Dependency(\.transcriptEditorCallbacks) var callbacks
+	@Dependency(\.llmAnalysis) var llmAnalysis
 
 	var body: some ReducerOf<Self> {
 		BindingReducer()
@@ -73,10 +75,22 @@ struct TranscriptEditorFeature {
 				return .none
 
 			case .confirmTapped:
-				let corrections = detectCorrections(
-					original: state.originalTranscript,
-					edited: state.transcript
-				)
+				state.isProcessing = true
+
+				let originalText = state.originalTranscript
+				let editedText = state.transcript
+
+				// Detect corrections asynchronously based on mode
+				return .run { send in
+					let corrections = await detectCorrections(
+						original: originalText,
+						edited: editedText
+					)
+					await send(.correctionsDetected(corrections))
+				}
+
+			case .correctionsDetected(let corrections):
+				state.isProcessing = false
 
 				// Call the callback directly
 				callbacks?.onConfirm(
@@ -101,30 +115,36 @@ struct TranscriptEditorFeature {
 		}
 	}
 
-	// 检测修改的词汇
-	private func detectCorrections(original: String, edited: String) -> [TextCorrection] {
-		guard original != edited else { return [] }
+	// 检测修改的词汇 - 根据配置使用传统算法或LLM
+	private func detectCorrections(original: String, edited: String) async -> [TextCorrection] {
+		@Shared(.hexSettings) var settings: HexSettings
 
-		let originalWords = original.split(separator: " ").map(String.init)
-		let editedWords = edited.split(separator: " ").map(String.init)
+		// Use LLM or traditional based on mode
+		switch settings.correctionAnalysisMode {
+		case .traditional:
+			// Use traditional algorithm
+			return TextDiffAlgorithm.detectCorrections(original: original, edited: edited)
 
-		var corrections: [TextCorrection] = []
-
-		// 简单的逐词对比（可以后续改进为更智能的 diff 算法）
-		let minCount = min(originalWords.count, editedWords.count)
-		for i in 0..<minCount {
-			let orig = originalWords[i].trimmingCharacters(in: .punctuationCharacters)
-			let edit = editedWords[i].trimmingCharacters(in: .punctuationCharacters)
-
-			if orig.lowercased() != edit.lowercased() && !orig.isEmpty && !edit.isEmpty {
-				corrections.append(TextCorrection(
-					original: orig,
-					corrected: edit
-				))
+		case .llm:
+			// Use LLM analysis
+			if settings.llmConfig.enabled && settings.llmConfig.isValid {
+				do {
+					let request = LLMAnalysisRequest(
+						originalText: original,
+						editedText: edited,
+						language: nil
+					)
+					let response = try await llmAnalysis.analyzeCorrections(request, settings.llmConfig)
+					return response.corrections
+				} catch {
+					// Fallback to traditional on error
+					return TextDiffAlgorithm.detectCorrections(original: original, edited: edited)
+				}
+			} else {
+				// LLM not configured, use traditional
+				return TextDiffAlgorithm.detectCorrections(original: original, edited: edited)
 			}
 		}
-
-		return corrections
 	}
 }
 

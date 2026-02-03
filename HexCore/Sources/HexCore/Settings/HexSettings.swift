@@ -48,6 +48,8 @@ public struct HexSettings: Codable, Equatable, Sendable {
 	public var hotwords: [String]
 	public var enableInstantEdit: Bool
 	public var autoLearnFromEdits: Bool
+	public var correctionAnalysisMode: CorrectionAnalysisMode
+	public var llmConfig: LLMConfig
 
 	public init(
 		soundEffectsEnabled: Bool = true,
@@ -74,7 +76,9 @@ public struct HexSettings: Codable, Equatable, Sendable {
 		wordRemappings: [WordRemapping] = [],
 		hotwords: [String] = [],
 		enableInstantEdit: Bool = true,
-		autoLearnFromEdits: Bool = true
+		autoLearnFromEdits: Bool = true,
+		correctionAnalysisMode: CorrectionAnalysisMode = .llm,
+		llmConfig: LLMConfig = LLMConfig()
 	) {
 		self.soundEffectsEnabled = soundEffectsEnabled
 		self.soundEffectsVolume = soundEffectsVolume
@@ -101,6 +105,8 @@ public struct HexSettings: Codable, Equatable, Sendable {
 		self.hotwords = hotwords
 		self.enableInstantEdit = enableInstantEdit
 		self.autoLearnFromEdits = autoLearnFromEdits
+		self.correctionAnalysisMode = correctionAnalysisMode
+		self.llmConfig = llmConfig
 	}
 
 	public init(from decoder: Decoder) throws {

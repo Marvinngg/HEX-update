@@ -36,6 +36,9 @@
     "•" : {
       "shouldTranslate" : false
     },
+    "10" : {
+
+    },
     "50" : {
       "localizations" : {
         "zh-Hans" : {
@@ -150,6 +153,12 @@
           }
         }
       }
+    },
+    "API 地址" : {
+
+    },
+    "API 密钥" : {
+
     },
     "Are you sure you want to delete all transcripts? This action cannot be undone." : {
       "comment" : "Delete transcript history confirm",
@@ -714,6 +723,9 @@
         }
       }
     },
+    "http://localhost:11434" : {
+
+    },
     "Ignore below %.1fs" : {
       "localizations" : {
         "de" : {
@@ -749,6 +761,15 @@
           }
         }
       }
+    },
+    "LLM 提供商" : {
+
+    },
+    "LLM 辅助分析" : {
+
+    },
+    "LLM 辅助分析可以更智能地提取热词和检测修改" : {
+
     },
     "Match" : {
       "localizations" : {
@@ -1076,6 +1097,9 @@
         }
       }
     },
+    "qwen2.5:7b" : {
+
+    },
     "Refresh available input devices" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1329,6 +1353,9 @@
         }
       }
     },
+    "sk-..." : {
+
+    },
     "Sound" : {
       "comment" : "sound section in general settings.",
       "localizations" : {
@@ -1399,6 +1426,9 @@
           }
         }
       }
+    },
+    "Temperature" : {
+
     },
     "Transcript Modifications" : {
       "localizations" : {
@@ -1618,16 +1648,34 @@
     "修改详情" : {
 
     },
+    "最大 Tokens" : {
+
+    },
+    "分析模式" : {
+
+    },
     "删除热词" : {
 
     },
     "取消" : {
 
     },
+    "启用" : {
+
+    },
     "已编辑" : {
 
     },
+    "支持 Ollama、LM Studio、OpenAI 等标准接口" : {
+
+    },
     "暂无热词，点击下方按钮添加" : {
+
+    },
+    "模型名称" : {
+
+    },
+    "测试连接" : {
 
     },
     "添加" : {
@@ -1651,7 +1699,13 @@
     "热词列表" : {
 
     },
+    "超时时间（秒）" : {
+
+    },
     "输入热词" : {
+
+    },
+    "高级设置" : {
 
     }
   },

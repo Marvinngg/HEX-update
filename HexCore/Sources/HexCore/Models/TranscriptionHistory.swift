@@ -17,6 +17,20 @@ public struct TextCorrection: Codable, Equatable, Identifiable, Sendable {
         self.corrected = corrected
         self.timestamp = timestamp
     }
+
+    // Custom decoder to handle LLM responses that only have original/corrected fields
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.original = try container.decode(String.self, forKey: .original)
+        self.corrected = try container.decode(String.self, forKey: .corrected)
+        // Use defaults for id and timestamp if not present in JSON
+        self.id = (try? container.decode(UUID.self, forKey: .id)) ?? UUID()
+        self.timestamp = (try? container.decode(Date.self, forKey: .timestamp)) ?? Date()
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, original, corrected, timestamp
+    }
 }
 
 public struct Transcript: Codable, Equatable, Identifiable, Sendable {

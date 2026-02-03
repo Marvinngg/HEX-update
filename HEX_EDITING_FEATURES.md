@@ -1299,9 +1299,489 @@ func handleTranscriptionError(
 9. **方言识别**：支持 22 种中文方言（粤语、四川话等）
 10. **架构升级**：引入 Apple MLX 框架，性能和功耗更优
 
-### 第三阶段：核心体验优化（2026年2月）
+### 第三阶段：核心体验优化（2026年2月初）
 11. **智能热词学习**：中英文分词、常见词过滤、语言自动识别
 12. **流畅的录音体验**：移除过早的模型检查，允许加载期间录音
+
+### 第四阶段：文本对比与热词算法优化（2026年2月3日）
+13. **Myers差分算法**：准确追踪词级别的修改
+14. **智能分词系统**：中英文混合文本精确tokenization
+15. **精准热词提取**：只学习真正被修改的词，不再学习整句
+
+---
+
+## 第四阶段详细说明：文本对比与热词算法优化
+
+### 问题背景
+
+**之前的问题**：
+用户修改了一个词，系统却把整句话都学习了：
+
+```
+原文: "请问 ClaudeBot 在这里评吗"
+修改: "请问 clawdbot 在这里评吗"
+
+期望: 学习 "ClaudeBot" → "clawdbot"
+实际: 添加整句 "请问 clawdbot 在这里评吗" 作为热词 ❌
+```
+
+**根本原因**：
+1. **简单的位置对比算法**：旧的diff算法按空格分词，逐位置比较
+2. **中文分词失败**：中文没有空格，整句被当作一个词
+3. **无法处理插入/删除**：只能比对相同位置的词
+
+---
+
+### 解决方案：Myers差分算法
+
+#### 新增文件：TextDiffAlgorithm.swift
+
+**位置**：`Hex/Features/TranscriptEditor/TextDiffAlgorithm.swift`
+
+**核心算法**：
+
+##### 1. 智能分词（Tokenization）
+
+```swift
+// 行 18-66
+static func tokenize(_ text: String) -> [String] {
+    var tokens: [String] = []
+    var currentToken = ""
+
+    for char in text {
+        let isChinese = ("\u{4E00}"..."\u{9FFF}").contains(char)
+        let isWhitespace = char.isWhitespace
+        let isPunctuation = char.isPunctuation
+
+        if isChinese {
+            // 中文字符：作为独立token
+            if !currentToken.isEmpty {
+                tokens.append(currentToken)
+                currentToken = ""
+            }
+            tokens.append(String(char))
+        } else if isWhitespace {
+            // 空格：刷新当前词
+            if !currentToken.isEmpty {
+                tokens.append(currentToken)
+                currentToken = ""
+            }
+        } else if isPunctuation {
+            // 标点：作为独立token
+            if !currentToken.isEmpty {
+                tokens.append(currentToken)
+                currentToken = ""
+            }
+            tokens.append(String(char))
+        } else {
+            // 字母/数字：累积到当前词
+            currentToken.append(char)
+        }
+    }
+
+    return tokens
+}
+```
+
+**示例**：
+```
+输入: "请问ClaudeBot在这里评吗？"
+输出: ["请", "问", "ClaudeBot", "在", "这", "里", "评", "吗", "？"]
+```
+
+##### 2. Myers差分算法
+
+这是一个经典的最短编辑距离算法，用于找到两个序列之间的最小差异。
+
+```swift
+// 行 68-102
+static func diff(_ original: [String], _ edited: [String]) -> [DiffOperation] {
+    let n = original.count
+    let m = edited.count
+    let max = n + m
+
+    var v = [Int: Int]()
+    v[1] = 0
+
+    var trace: [[Int: Int]] = []
+
+    // Forward search (找到最短路径)
+    for d in 0...max {
+        trace.append(v)
+
+        for k in stride(from: -d, through: d, by: 2) {
+            var x: Int
+
+            if k == -d || (k != d && v[k - 1]! < v[k + 1]!) {
+                x = v[k + 1]!
+            } else {
+                x = v[k - 1]! + 1
+            }
+
+            var y = x - k
+
+            // Follow diagonal (相同的token)
+            while x < n && y < m && original[x] == edited[y] {
+                x += 1
+                y += 1
+            }
+
+            v[k] = x
+
+            if x >= n && y >= m {
+                return backtrack(trace, original, edited)
+            }
+        }
+    }
+}
+```
+
+**返回的操作类型**：
+```swift
+enum DiffOperation {
+    case delete(index: Int, word: String)   // 删除操作
+    case insert(index: Int, word: String)   // 插入操作
+    case equal(index: Int, word: String)    // 相同token
+}
+```
+
+##### 3. 提取修正（Extract Corrections）
+
+```swift
+// 行 167-201
+static func extractCorrections(from operations: [DiffOperation]) -> [TextCorrection] {
+    var corrections: [TextCorrection] = []
+    var i = 0
+
+    while i < operations.count {
+        switch operations[i] {
+        case .delete(_, let deletedWord):
+            // 查找匹配的insert（替换操作）
+            if i + 1 < operations.count,
+               case .insert(_, let insertedWord) = operations[i + 1] {
+                let original = deletedWord.trimmingCharacters(in: .punctuationCharacters)
+                let corrected = insertedWord.trimmingCharacters(in: .punctuationCharacters)
+
+                if !original.isEmpty && !corrected.isEmpty &&
+                   original.lowercased() != corrected.lowercased() {
+                    corrections.append(TextCorrection(
+                        original: original,
+                        corrected: corrected
+                    ))
+                }
+                i += 2  // 跳过delete和insert
+            } else {
+                i += 1
+            }
+        case .insert, .equal:
+            i += 1
+        }
+    }
+
+    return corrections
+}
+```
+
+##### 4. 智能热词提取
+
+```swift
+// 行 217-254
+static func extractHotwords(
+    from corrections: [TextCorrection],
+    commonWords: Set<String>
+) -> [String] {
+    var hotwords: [String] = []
+
+    for correction in corrections {
+        let correctedText = correction.corrected.trimmingCharacters(...)
+
+        // 检测是否包含中文
+        let containsChinese = correctedText.rangeOfCharacter(
+            from: CharacterSet(charactersIn: "\u{4E00}"..."\u{9FFF}")
+        ) != nil
+
+        if containsChinese {
+            // 中文：添加整个短语（2-10字符，非常见词）
+            let length = correctedText.count
+            if length >= 2 && length <= 10 && !commonWords.contains(correctedText) {
+                hotwords.append(correctedText)
+            }
+        } else {
+            // 英文：按空格分词，提取单词
+            let words = correctedText.split(separator: " ").map {
+                String($0).trimmingCharacters(in: .punctuationCharacters)
+            }
+
+            for word in words {
+                // 跳过短词（< 3字符）和常见词
+                guard word.count >= 3, !commonWords.contains(word.lowercased()) else {
+                    continue
+                }
+                hotwords.append(word)
+            }
+        }
+    }
+
+    return hotwords
+}
+```
+
+---
+
+### 修改的文件
+
+#### 1. TranscriptEditorFeature.swift
+
+**修改前**（行 105-128）：
+```swift
+private func detectCorrections(original: String, edited: String) -> [TextCorrection] {
+    guard original != edited else { return [] }
+
+    let originalWords = original.split(separator: " ").map(String.init)
+    let editedWords = edited.split(separator: " ").map(String.init)
+
+    var corrections: [TextCorrection] = []
+
+    // 简单的逐词对比
+    let minCount = min(originalWords.count, editedWords.count)
+    for i in 0..<minCount {
+        let orig = originalWords[i].trimmingCharacters(in: .punctuationCharacters)
+        let edit = editedWords[i].trimmingCharacters(in: .punctuationCharacters)
+
+        if orig.lowercased() != edit.lowercased() && !orig.isEmpty && !edit.isEmpty {
+            corrections.append(TextCorrection(
+                original: orig,
+                corrected: edit
+            ))
+        }
+    }
+
+    return corrections
+}
+```
+
+**修改后**（行 105-108）：
+```swift
+// 检测修改的词汇 - 使用 Myers diff 算法进行智能对比
+private func detectCorrections(original: String, edited: String) -> [TextCorrection] {
+    return TextDiffAlgorithm.detectCorrections(original: original, edited: edited)
+}
+```
+
+#### 2. TranscriptionFeature.swift
+
+**修改内容**：
+
+1. **简化热词学习逻辑**（行 536-567）：
+```swift
+$settings.withLock { settings in
+    // 1. 添加词汇映射
+    for correction in corrections {
+        let exists = settings.wordRemappings.contains { remapping in
+            remapping.match.lowercased() == correction.original.lowercased()
+        }
+
+        if !exists {
+            let newRemapping = WordRemapping(
+                match: correction.original,
+                replacement: correction.corrected
+            )
+            settings.wordRemappings.append(newRemapping)
+            transcriptionFeatureLogger.info("Auto-learned word remapping: '\(correction.original)' → '\(correction.corrected)'")
+        }
+    }
+
+    // 2. 使用智能算法提取热词
+    let commonWords = getCommonWords()
+    let hotwords = TextDiffAlgorithm.extractHotwords(
+        from: corrections,
+        commonWords: commonWords
+    )
+
+    for hotword in hotwords {
+        let hotwordLower = hotword.lowercased()
+        if !settings.hotwords.contains(where: { $0.lowercased() == hotwordLower }) {
+            settings.hotwords.append(hotword)
+            transcriptionFeatureLogger.info("Auto-learned hotword: '\(hotword)'")
+        }
+    }
+}
+```
+
+2. **重构常见词函数**（行 712-744）：
+```swift
+// 从 isCommonWord(_ word: String) -> Bool
+// 改为 getCommonWords() -> Set<String>
+
+private func getCommonWords() -> Set<String> {
+    return [
+        // English common words
+        "the", "and", "for", ...
+
+        // Chinese common words
+        "的", "是", "在", ...
+    ]
+}
+```
+
+---
+
+### 实际效果对比
+
+#### 场景 1：中文句子中的英文词修正
+
+**输入**：
+```
+原文: "请问ClaudeBot在这里评吗"
+修改: "请问clawdbot在这里评吗"
+```
+
+**旧算法**：
+```
+分词结果: ["请问ClaudeBot在这里评吗"]  // 整句作为一个token
+检测到的修正: []                      // 没有检测到任何修正
+添加的热词: "请问clawdbot在这里评吗"   // ❌ 错误：整句作为热词
+```
+
+**新算法**：
+```
+分词结果: ["请", "问", "ClaudeBot", "在", "这", "里", "评", "吗"]
+编辑后:   ["请", "问", "clawdbot", "在", "这", "里", "评", "吗"]
+
+Diff操作:
+  equal("请")
+  equal("问")
+  delete("ClaudeBot")  ←
+  insert("clawdbot")   ← 配对为替换
+  equal("在")
+  equal("这")
+  equal("里")
+  equal("评")
+  equal("吗")
+
+检测到的修正: [TextCorrection(original: "ClaudeBot", corrected: "clawdbot")]
+添加的词汇映射: "ClaudeBot" → "clawdbot"
+添加的热词: "clawdbot"  // ✅ 正确：只学习被修改的词
+```
+
+#### 场景 2：英文句子词序变化
+
+**输入**：
+```
+原文: "Hello world this is a test"
+修改: "Hello this is a world test"
+```
+
+**旧算法**：
+```
+逐位置比较:
+  位置0: "Hello" = "Hello" ✓
+  位置1: "world" ≠ "this"  ← 检测为修正 ❌
+  位置2: "this"  ≠ "is"    ← 检测为修正 ❌
+  位置3: "is"    ≠ "a"     ← 检测为修正 ❌
+  位置4: "a"     ≠ "world" ← 检测为修正 ❌
+
+错误修正: ["world"→"this", "this"→"is", "is"→"a", "a"→"world"]
+```
+
+**新算法**：
+```
+Diff操作:
+  equal("Hello")
+  delete("world")
+  equal("this")
+  equal("is")
+  equal("a")
+  insert("world")
+  equal("test")
+
+检测到的修正: []  // ✅ 正确：只是词序变化，没有真正的词汇修正
+```
+
+#### 场景 3：混合中英文修正
+
+**输入**：
+```
+原文: "我用Anthropic的API来开发"
+修改: "我用Claude的API来开发应用"
+```
+
+**新算法分词**：
+```
+原始: ["我", "用", "Anthropic", "的", "API", "来", "开", "发"]
+编辑: ["我", "用", "Claude", "的", "API", "来", "开", "发", "应", "用"]
+
+Diff操作:
+  equal("我")
+  equal("用")
+  delete("Anthropic")  ←
+  insert("Claude")     ← 替换
+  equal("的")
+  equal("API")
+  equal("来")
+  equal("开")
+  equal("发")
+  insert("应")         ← 新增词
+  insert("用")         ← 新增词
+
+检测到的修正: [TextCorrection(original: "Anthropic", corrected: "Claude")]
+添加的词汇映射: "Anthropic" → "Claude"
+添加的热词: "Claude"  // ✅ 正确：只学习替换的词，不学习新增的常见词
+```
+
+---
+
+### 技术优势
+
+#### 1. **准确性**
+- ✅ 中英文混合文本正确分词
+- ✅ 只学习真正被修改的词
+- ✅ 正确处理插入、删除、替换操作
+- ✅ 忽略词序变化
+
+#### 2. **智能性**
+- ✅ 自动识别中文字符
+- ✅ 区分单词、标点、空格
+- ✅ 过滤常见词（200+词库）
+- ✅ 长度过滤（英文≥3字符，中文≥2字符）
+
+#### 3. **性能**
+- ✅ O(ND) 时间复杂度（D为差异数量）
+- ✅ 对于大多数编辑操作都是最优算法
+- ✅ 内存占用合理
+
+#### 4. **可维护性**
+- ✅ 算法独立封装
+- ✅ 清晰的函数职责
+- ✅ 易于测试和调试
+
+---
+
+### 日志示例
+
+**修正前**（旧算法）：
+```
+[INFO] Added Chinese hotword: '请问clawdbot在这里评吗' (from correction '...' → '...')
+```
+
+**修正后**（新算法）：
+```
+[INFO] Auto-learned word remapping: 'ClaudeBot' → 'clawdbot'
+[INFO] Auto-learned hotword: 'clawdbot'
+```
+
+---
+
+### 文件修改清单
+
+| 文件路径 | 修改类型 | 主要改动 |
+|---------|---------|---------|
+| `Hex/Features/TranscriptEditor/TextDiffAlgorithm.swift` | 新增 | Myers差分算法、智能分词、热词提取 |
+| `Hex/Features/TranscriptEditor/TranscriptEditorFeature.swift` | 修改 | 使用新算法替换旧的对比逻辑 |
+| `Hex/Features/Transcription/TranscriptionFeature.swift` | 修改 | 简化热词学习逻辑，使用智能提取 |
+| `Hex/Features/Transcription/TranscriptionFeature.swift` | 重构 | isCommonWord → getCommonWords |
+
+---
 
 ### 技术亮点总结
 - ✅ 完整的 TCA 架构实现
@@ -1311,5 +1791,8 @@ func handleTranscriptionError(
 - ✅ 完全本地化推理，保护隐私
 - ✅ 智能的中英文处理
 - ✅ 流畅的用户体验设计
+- ✅ **Myers差分算法精准对比**
+- ✅ **智能中英文混合分词**
+- ✅ **词级别精准热词学习**
 
-用户体验流畅，技术实现稳健，模型支持全面，学习机制智能。🚀
+用户体验流畅，技术实现稳健，模型支持全面，学习机制智能，算法准确高效。🚀
